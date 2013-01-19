@@ -1,7 +1,8 @@
 // mysql2parse
 // interactive command-line application for migrating a mysql database to the Parse cloud
 //
-// 1/18/2013 - starting.
+// 1/18/2013 - Starting.
+// 1/19/2013 - Works for simple example database.
 
 var clc = require('cli-color'),
     u = require('underscore'),
