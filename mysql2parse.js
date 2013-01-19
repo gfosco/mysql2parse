@@ -33,7 +33,9 @@ var tables = [];
 var columns = {};
 var tableRelations = [];
 var tableDependencies = {};
+var fieldsToCache = {};
 var fieldCache = {};
+var migrating = 0;
 
 var tablesCompleted = [];
 
@@ -150,7 +152,7 @@ function enterRelationsLoop() {
     
     if (tableRelations.length) {
         u.each(tableRelations, function(relation) { 
-           console.log('Table ' + clc.greenBright(relation.source) + ' is related to ' + clc.greenBright(relation.target) + ' via the ' + clc.greenBright(relation.field) + ' column.'); 
+           console.log('Relation exists from ' + clc.greenBright(relation.source) + '.' + clc.greenBright(relation.sourceField) + ' to ' + clc.greenBright(relation.target) + '.' + clc.greenBright(relation.targetField)); 
         });        
         console.log('\n');
         u.each(tables, function(table) {
@@ -191,14 +193,25 @@ function startAddRelation() {
                 program.prompt('Which column # refers to the Parent? ', Number, function(field) { 
                    if (field >= 0 && field < columns[destTable].length) {
                        var destField = columns[destTable][field];
-                       tableRelations.push({
-                          source:sourceTable,
-                          target:destTable,
-                          field:destField
-                       });   
-                       if (u.indexOf(tableDependencies[destTable],sourceTable) == -1) tableDependencies[destTable].push(sourceTable);
-                   }
-                   enterRelationsLoop();
+                       listColumns(sourceTable);
+                       program.prompt('Which column # identified this Parent object? ', Number, function(field) { 
+                            if (field >= 0 && field < columns[sourceTable].length) {
+                                var sourceField = columns[sourceTable][field];
+                                tableRelations.push({
+                                    source:sourceTable,
+                                    target:destTable,
+                                    targetField:destField,
+                                    sourceField:sourceField
+                                });   
+                                if (u.indexOf(tableDependencies[destTable],sourceTable) == -1) tableDependencies[destTable].push(sourceTable);
+                                if (!fieldsToCache[sourceTable]) fieldsToCache[sourceTable] = {};
+                                fieldsToCache[sourceTable][sourceField] = 1;
+                                if (!fieldCache[sourceTable]) fieldCache[sourceTable] = {};
+                                if (!fieldCache[sourceTable][sourceField]) fieldCache[sourceTable][sourceField] = {};
+                            }
+                            enterRelationsLoop(); 
+                       });
+                   } else enterRelationsLoop();                   
                 });
                } else enterRelationsLoop();
            })
@@ -209,8 +222,6 @@ function startAddRelation() {
 
 function startMigration() { 
     
-    while (tablesCompleted.length < tables.length) {
-        
         u.each(tables, function(table) { 
            
            if (u.indexOf(tablesCompleted, table) == -1) {
@@ -231,9 +242,11 @@ function startMigration() {
             
         });        
         
+    if (tablesCompleted.length < tables.length) {
+        setTimeout(startMigration,1000);    
+    } else {
+        exitSafe();    
     }
-    
-    exitSafe();
     
 }
 
@@ -257,7 +270,18 @@ function listColumns(table) {
 
 function migrateTable(table) { 
     
-    console.log('Mock migrating table ' + clc.greenBright(table));
-    tablesCompleted.push(table);
+    if (migrating) return;
+    migrating = 1;
+    
+    console.log('Migrating table ' + clc.greenBright(table));
+    mysqlConnection.query('select * from ' + table, function(err, rows) {
+       if (err) return exitError(err);
+       u.each(rows, function(row) { 
+           
+       }); 
+       console.log(clc.greenBright('Migrated ' + rows.length + ' objects.'));      
+       tablesCompleted.push(table);
+       migrating = 0;
+    });
     
 }
