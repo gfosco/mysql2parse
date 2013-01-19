@@ -111,8 +111,7 @@ function testMysqlConnection() {
     
 }
 
-// Due to the asynchronous patterns involved, I'm using a specific exit function and the 'migrating' variable
-// to ensure the application doesn't exit before everything is complete.
+// Don't exit if the migration is still in process.
 function exitSafe() { 
     
     if (migrating) return setTimeout(exitSafe,1000);
