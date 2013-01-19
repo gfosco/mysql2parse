@@ -6,7 +6,8 @@
 var clc = require('cli-color'),
     u = require('underscore'),
     program = require('commander'),
-    mysql = require('mysql');
+    mysql = require('mysql'),
+    Parse = require('node-parse-api').Parse;
     
 
 program
@@ -26,6 +27,7 @@ var mysqlPass = program.pass ? program.pass : '';
 var mysqlDatabase = program.database ? program.database : '';
 var appId = program.appid ? program.appid : '';
 var masterKey = program.masterkey ? program.masterkey : '';
+var parseApp;
 
 var tables = [];
 var columns = {};
@@ -51,6 +53,7 @@ function checkVariables() {
     if (!appId) return program.prompt('Please enter the Parse application Id: ', function(response) { appId = response; checkVariables(); });
     if (!masterKey) return program.prompt('Please enter the Parse application Master Key: ', function(response) { masterKey = response; checkVariables(); });
 
+    parseApp = new Parse(appId,masterKey);
     showConfirm(testMysqlConnection, exitSafe);
 }
 
