@@ -1,0 +1,131 @@
+Example session, executed with command line data:
+
+
+===== mysql2parse =====
+
+Migration tool for moving to the Parse Cloud.
+
+
+===== Review Current Settings =====
+
+
+MySQL Host: localhost
+MySQL Username: root
+MySQL Password: *******
+MySQL Database: mysql2parse
+Parse Application ID: pFCxxAjjZtAUr03Vmh1sjBZh24Gp9uTujBlzAjJ9
+Parse Master Key: mZt2gWHj37I3uXr1zPnfyCr2GluMaacf7RCc8PaC
+
+
+Do you want to continue with the migration?  y
+
+MySQL Settings Tested Successfully.
+
+
+Loaded 3 tables.
+
+
+Loading columns for tables...
+
+
+Finished loading columns.
+
+
+=== Configure Relations ===
+
+No relations configured.
+
+Would you like to add a relation? y
+
+Table listing:
+0:  customers
+1:  orders
+2:  products
+
+
+Which table # is the Parent/Source? 0
+
+Table listing:
+0:  customers
+1:  orders
+2:  products
+
+
+Which table # is the Child/Destination? 1
+
+Table listing:
+0:  id
+1:  customerId
+2:  productId
+3:  orderDate
+4:  orderQty
+Which column # refers to the Parent? 1
+
+Table listing:
+0:  id
+1:  customerName
+2:  customerEmail
+Which column # identified this Parent object? 0
+
+=== Configure Relations ===
+
+Relation exists from customers.id to orders.customerId
+
+
+Table orders is dependent on customers
+
+
+Would you like to add a relation? y
+
+Table listing:
+0:  customers
+1:  orders
+2:  products
+
+
+Which table # is the Parent/Source? 2
+
+Table listing:
+0:  customers
+1:  orders
+2:  products
+
+
+Which table # is the Child/Destination? 1
+
+Table listing:
+0:  id
+1:  customerId
+2:  productId
+3:  orderDate
+4:  orderQty
+Which column # refers to the Parent? 2
+
+Table listing:
+0:  id
+1:  productName
+2:  productType
+3:  productPrice
+Which column # identified this Parent object? 0
+
+=== Configure Relations ===
+
+Relation exists from customers.id to orders.customerId
+Relation exists from products.id to orders.productId
+
+
+Table orders is dependent on customers
+Table orders is dependent on products
+
+
+Would you like to add a relation? n
+
+
+The migration is ready to begin.  Continue? y
+Migrating table customers
+Migrated 3 objects.
+Migrating table products
+Migrated 3 objects.
+Migrating table orders
+Migrated 4 objects.
+Application exiting without error.

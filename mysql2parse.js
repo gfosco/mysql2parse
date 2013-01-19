@@ -16,8 +16,8 @@ program
 .option('-l, --login [value]', 'MySQL login name')
 .option('-p, --pass [value]', 'MySQL password')
 .option('-d, --database [value]', 'MySQL database name')
-.option('-ai, --appid [value]', 'Parse Application ID')
-.option('-mk, --masterkey [value]', 'Parse Application Master Key')
+.option('-a, --appid [value]', 'Parse Application ID')
+.option('-m, --masterkey [value]', 'Parse Application Master Key')
 .parse(process.argv);
 
 var mysqlConnection;
@@ -101,6 +101,7 @@ function testMysqlConnection() {
 
 function exitSafe() { 
     
+    if (migrating) return setTimeout(exitSafe,1000);
     console.log(clc.yellow('Application exiting without error.'));
     process.exit();
     
@@ -253,7 +254,7 @@ function startMigration() {
 function listTables() {
     console.log('\n' + clc.yellowBright('Table listing:'));
     u.each(tables, function(table, idx) {
-        console.log(clc.blueBright(idx) + ':  ' + clc.greenBright(table));
+        console.log(clc.greenBright(idx) + ':  ' + clc.greenBright(table));
     });
     console.log('\n');
 }
@@ -262,7 +263,7 @@ function listColumns(table) {
     if (columns[table]) {
         console.log('\n' + clc.yellowBright('Table listing:'));
         u.each(columns[table], function(col, idx) { 
-           console.log(clc.blueBright(idx) + ':  ' + clc.greenBright(col)); 
+           console.log(clc.greenBright(idx) + ':  ' + clc.greenBright(col)); 
         });
     }
 }
@@ -272,16 +273,54 @@ function migrateTable(table) {
     
     if (migrating) return;
     migrating = 1;
+
+    //console.log(fieldCache);
     
     console.log('Migrating table ' + clc.greenBright(table));
     mysqlConnection.query('select * from ' + table, function(err, rows) {
        if (err) return exitError(err);
-       u.each(rows, function(row) { 
+       u.each(rows, function(row) {
+           
+           migrating++;
+           
+           (function() {
+           
+               var obj = row;
+               //console.log(obj);    
+               if (obj.id) {
+                   obj['oldId'] = obj.id;
+                   delete obj.id;
+               }
+               
+               if (tableDependencies[table] && tableDependencies[table].length > 0) { 
+                   u.each(tableRelations, function(relation) {
+                      if (relation.target == table) {
+                          var pointer = {"__type":"Pointer","className":relation.source,"objectId":fieldCache[relation.source][relation.sourceField][row[relation.targetField]]};
+                          obj[relation.targetField] = pointer;
+                      } 
+                   });
+               }
+               
+               //console.log(obj);
+               
+               parseApp.insert(table, obj, function(err, res) {
+                  migrating--;
+                  if (err) exitError(err); 
+                  //console.log(res);
+                  if (fieldsToCache[table]) {
+                      for (var n in fieldsToCache[table]) {
+                          //console.log('Caching the value of ' + n + ' from table: ' + table);
+                          fieldCache[table][n][row[n == 'id' ? 'oldId' : n]] = res.objectId;
+                      }
+                  }
+               });
+               
+           })();
            
        }); 
        console.log(clc.greenBright('Migrated ' + rows.length + ' objects.'));      
        tablesCompleted.push(table);
-       migrating = 0;
+       migrating--;
     });
     
 }
