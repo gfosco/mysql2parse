@@ -164,7 +164,11 @@ function enterRelationsLoop() {
 
     program.confirm('Would you like to add a relation? ', function(ok) { 
        if (ok) return startAddRelation();
-       startMigration();
+       program.confirm('\n\n' + clc.yellowBright('The migration is ready to begin.  Continue?') + ' ', function(ok) { 
+          if (ok) {
+              startMigration();
+          } else exitSafe();
+       });
     });
         
 }
@@ -202,19 +206,22 @@ function startAddRelation() {
 
 function startMigration() { 
     
-    // not done yet, stopping for the night.
-    exitSafe();
-    
     while (tablesCompleted.length < tables.length) {
         
         u.each(tables, function(table) { 
            
            if (u.indexOf(tablesCompleted, table) == -1) {
                
-               if (!tableHasRelation(table)) {
-                   
+               if (tableDependencies[table] && tableDependencies[table].length) {
+                   var canDo = 1;
+                   u.each(tableDependencies[table], function(dep) { 
+                      if (u.indexOf(tablesCompleted,dep) == -1) canDo = 0; 
+                   });
+                   if (canDo) {
+                       migrateTable(table);
+                   }
                } else {
-                   
+                   migrateTable(table);
                }
                
            }
@@ -242,4 +249,12 @@ function listColumns(table) {
            console.log(clc.blueBright(idx) + ':  ' + clc.greenBright(col)); 
         });
     }
+}
+
+
+function migrateTable(table) { 
+    
+    console.log('Mock migrating table ' + clc.greenBright(table));
+    tablesCompleted.push(table);
+    
 }
