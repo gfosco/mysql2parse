@@ -19,5 +19,6 @@ Define relationships between MySQL tables and they will be converted to Parse Re
             -mk, --masterkey [value]  Parse Application Master Key
 
 
+See output of example session (minus cool cli-colors) here: https://github.com/gfosco/mysql2parse/blob/master/example-session-output.txt
     
     
