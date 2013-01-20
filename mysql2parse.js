@@ -247,6 +247,7 @@ function startAddRelation() {
 //    ex. sort the array, weighted by dependencies; a different async/await pattern; etc.
 // Each pass will find more tables available to load.  (parent tables in a relationship must be completed
 //   before the child table can be migrated)
+// This needs work.
 function startMigration() { 
     
     u.each(tables, function(table) { 

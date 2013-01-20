@@ -1,5 +1,6 @@
-Example session, executed with command line data:
-
+$ node mysql2parse.js -h localhost -l root -p ****** -d mysql2parse --appid pFC
+xxAjjZtAUr03Vmh1sjBZh24Gp9uTujBlzAjJ9 --masterkey mZt2gWHj37I3uXr1zPnfyCr2GluMa
+acf7RCc8PaC
 
 ===== mysql2parse =====
 
@@ -11,7 +12,7 @@ Migration tool for moving to the Parse Cloud.
 
 MySQL Host: localhost
 MySQL Username: root
-MySQL Password: *******
+MySQL Password: ******
 MySQL Database: mysql2parse
 Parse Application ID: pFCxxAjjZtAUr03Vmh1sjBZh24Gp9uTujBlzAjJ9
 Parse Master Key: mZt2gWHj37I3uXr1zPnfyCr2GluMaacf7RCc8PaC
@@ -53,7 +54,7 @@ Table listing:
 
 Which table # is the Child/Destination? 1
 
-Table listing:
+Column listing for orders:
 0:  id
 1:  customerId
 2:  productId
@@ -61,7 +62,7 @@ Table listing:
 4:  orderQty
 Which column # refers to the Parent? 1
 
-Table listing:
+Column listing for customers:
 0:  id
 1:  customerName
 2:  customerEmail
@@ -93,7 +94,7 @@ Table listing:
 
 Which table # is the Child/Destination? 1
 
-Table listing:
+Column listing for orders:
 0:  id
 1:  customerId
 2:  productId
@@ -101,7 +102,7 @@ Table listing:
 4:  orderQty
 Which column # refers to the Parent? 2
 
-Table listing:
+Column listing for products:
 0:  id
 1:  productName
 2:  productType
